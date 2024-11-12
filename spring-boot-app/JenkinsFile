@@ -14,7 +14,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Pull code from the repository
-                git url: 'https://github.com/codekbganesh/Jenkins_SpringBoot_Project1.git', credentialsId: 'github-token'
+                git url: 'https://github.com/codekbganesh/Jenkins_SpringBoot_Project1.git'
             }
         }
 
