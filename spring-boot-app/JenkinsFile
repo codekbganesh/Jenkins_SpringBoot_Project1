@@ -1,46 +1,42 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'Maven' // Make sure this matches the name of your Maven installation in Jenkins
-        jdk 'JDK17'  // Ensure this matches your Java version (e.g., 'JDK11' or another version)
-    }
-
     environment {
-        PROJECT_PATH = 'spring-boot-app' // Relative path to your Spring Boot project directory
+        MAVEN_HOME = tool name: 'Maven' // Ensure this matches your Maven configuration in Jenkins
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                // Pull code from the repository
-                git branch: 'main', url: 'https://github.com/codekbganesh/Jenkins_SpringBoot_Project1.git'
+                git url: 'https://github.com/codekbganesh/Jenkins_SpringBoot_Project1', branch: 'main'
             }
         }
 
         stage('Build with Maven') {
             steps {
-                dir("${PROJECT_PATH}") {
-                    // Run Maven commands to build the project
-                    sh 'mvn clean package'
+                dir('spring-boot-app') {  // Navigate to the project directory
+                    script {
+                        sh "${MAVEN_HOME}/bin/mvn clean package"
+                    }
                 }
             }
         }
 
         stage('Archive JAR') {
             steps {
-                // Archive the JAR file for easy access in Jenkins
-                archiveArtifacts artifacts: "${PROJECT_PATH}/target/*.jar", allowEmptyArchive: true
+                dir('spring-boot-app') {  // Ensure path points to the correct folder
+                    archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Build completed successfully!'
+            echo 'Build and packaging succeeded!'
         }
         failure {
-            echo 'Build failed. Check logs for details.'
+            echo 'Build or packaging failed.'
         }
     }
 }
