@@ -1,43 +1,42 @@
-# Jenkins_SpringBoot_Project_ONLY BUILDING_JARFILE_USING_MAVEN
+# HOW TO CONVERT THE APPLICATION AS DOCKER CONTAINER:
 
-
-1. Install Jenkins in a Linux Machine using the below Commands:
+1. First Create an Ubuntu22 EC2 instance in AWS or Whatever platfrom you prefer.
+2. My application Code all will be placed in the spring-boot-app folder, Copy the entire Project folder into the AWS server.
+3. If we are going to make live an Java application the below pre-requisites are much needed.
 
 ```
 sudo apt update
 
-sudo apt install openjdk-17-jre
+sudo apt install openjdk-17-jdk -y
 
 java -version
 
-curl -fsSL https://pkg.jenkins.io/debian/jenkins.io-2023.key | sudo tee \
-  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
-
-echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
-  https://pkg.jenkins.io/debian binary/ | sudo tee \
-  /etc/apt/sources.list.d/jenkins.list > /dev/null
-
-sudo apt-get update
-
-sudo apt-get install jenkins
+sudo apt install maven -y
 ```
 
-2. Create The Pipeline in a Jenkins and Choose the Github as a SCM.
+4. Then Create the Java Project as a Jar file run the below Maven command:
 
-Plugins: Maven Needed for this.
+```
+mvn clean package (For Creating Jar file)
+```
+Create the Dockerfile to Build the the application as container. Your Docker file would be in the exact project folder where pox.xml is there.
 
-Jenkins Groovy Script: Placed in the following Path.
+My Docker file will be in the Following Path: 2.CONTAINER_AN_APPLICATION/spring-boot-app/DockerFile
 
-Once Maven Added Just set the Maven in the Global Configuration Section.
+5. Build the application as an Image:
 
-3. Intiate the Build.
+```
+docker build -t my-spring-app:1.0 .
 
-Start the BUild. Once Build completed JAR File will be located in the following directory: target/spring-boot-web.jar
+docker images
+```
 
-4. Check the Apllication Status.
+6. Run the Container and Expose the Port to Outside:
 
-Note: Both Jenkins and Spring Boot listens Same Port 8080, So we need to stop the Jenkins. (systemctl stop jenkins)
+```
+docker run -d -p 8080:8080 my-spring-app:1.0
+```
 
-Then Run the JAR File: nohup java -jar target/spring-boot-web.jar &
+#Check The Application Status:
 
-5. Check On the Brwoser, You will get the Page.
+![images/app2.png](images/app2.png)

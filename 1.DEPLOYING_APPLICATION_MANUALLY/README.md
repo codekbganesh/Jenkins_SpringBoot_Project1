@@ -4,7 +4,7 @@ The Below Stpes are used to make live an simple Java Spring application in Ubunt
 
 1. First Create an Ubuntu22 EC2 instance in AWS or Whatever platfrom you prefer.
 2. My application Code all will be placed in the spring-boot-app folder, Copy the entire Project folder into the AWS server.
-3. If we are going to make live an Java application the below pre-requisites are Much needed.
+3. If we are going to make live an Java application the below pre-requisites are much needed.
 
 ```
 sudo apt update
@@ -23,7 +23,7 @@ mvn clean package (For Creating Jar file)
 ```
 5. Once you run the mvn clean package command, You will get the jar file in the same directory and path would be target/spring-boot-web.jar
 
-6. Run your Spring Boot apl=plication using the below Command:
+6. Run your Spring Boot application using the below Command:
 
 java -jar target/spring-boot-web.jar (Just running the Application)
 
