@@ -37,6 +37,6 @@ docker images
 docker run -d -p 8080:8080 my-spring-app:1.0
 ```
 
-#Check The Application Status:
+# Check The Application Status:
 
 ![images/app2.png](images/app2.png)
