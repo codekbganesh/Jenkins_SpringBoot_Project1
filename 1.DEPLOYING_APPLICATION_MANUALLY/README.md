@@ -26,6 +26,11 @@ mvn clean package (For Creating Jar file)
 6. Run your Spring Boot apl=plication using the below Command:
 
 java -jar target/spring-boot-web.jar (Just running the Application)
+
 nohup java -jar target/spring-boot-web.jar & (Running the Application in Backend)
 
 Note: Open the Port 8080 and Check the application Status.
+
+![images/app.PNG](images/app.PNG)
+
+
