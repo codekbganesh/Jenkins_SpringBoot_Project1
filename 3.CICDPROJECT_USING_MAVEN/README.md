@@ -1,4 +1,4 @@
-# USED CICD AS JENKINS AND CREATED JAR FILE USING MAVEN
+# USED JENKINS AND CREATED JAR FILE USING MAVEN
 
 1. Install Jenkins in a Linux Machine using the below Commands:
 
