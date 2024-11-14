@@ -21,7 +21,7 @@ mvn clean package (For Creating Jar file)
 ```
 Create the Dockerfile to Build the the application as container. Your Docker file would be in the exact project folder where pox.xml is there.
 
-My Docker file will be in the Following Path: 2.CONTAINER_AN_APPLICATION/spring-boot-app/DockerFile
+My Docker build file will be in the Following Path: 2.CONTAINER_AN_APPLICATION/spring-boot-app/DockerFile
 
 5. Build the application as an Image:
 
