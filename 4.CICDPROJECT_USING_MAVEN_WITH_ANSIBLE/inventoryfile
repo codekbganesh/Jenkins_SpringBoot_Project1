@@ -1,0 +1,5 @@
+[jenkins]
+172.31.34.179 ansible_user=root
+
+[prod]
+172.31.38.162 ansible_user=root
