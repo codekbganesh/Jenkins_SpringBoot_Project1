@@ -18,7 +18,6 @@ echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
 
 sudo apt-get update
 
-sudo apt-get install 
 ```
 
 2. Create The Pipeline project in Jenkins and Choose the Github as a SCM.

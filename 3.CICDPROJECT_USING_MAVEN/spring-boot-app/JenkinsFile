@@ -14,7 +14,7 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                dir('spring-boot-app') {  // Navigate to the project directory
+                dir('3.CICDPROJECT_USING_MAVEN/spring-boot-app') {  // Navigate to the project directory
                     script {
                         sh "${MAVEN_HOME}/bin/mvn clean package"
                     }
@@ -24,7 +24,7 @@ pipeline {
 
         stage('Archive JAR') {
             steps {
-                dir('spring-boot-app') {  // Ensure path points to the correct folder
+                dir('3.CICDPROJECT_USING_MAVEN/spring-boot-app') {  // Ensure path points to the correct folder
                     archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
                 }
             }
