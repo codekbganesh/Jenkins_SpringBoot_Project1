@@ -1,8 +1,13 @@
-# USED JENKINS AND CREATED JAR FILE USING  MAVEN AND DEPLOYED USING ANSIPLAYBOOK
+# USED JENKINS TO CREATE A DOCKER IMAGE, STORED IT IN DOCKER HUB, AND DEPLOYED THE IMAGE USING AN ANSIBLE PLAYBOOK.
 
-In this project Used Three Servers. One for Jenkins Server to build jar file, Second is for ansible to Deploy to deploy the jar file from jenkins server to Production Server, Finally the Production server which running the old version of the app.
+In this project Used Three Servers. One for Jenkins Server to build docker image and store it into the dockerhub, Second is for ansible server to Deploy to docker image from jenkins server to Production Server, Finally the Production server which running the old version of the app.
 
-# Steps to Setup a Jenkins Server
+Note: People Always use the Jenkins master and Slave concept for Splitting workload. In this project we used
+docker as an agent.
+
+Advantages if we use docker as an agent: Will encounters cost for slave servers even developers don't commit any codes for a week.  
+
+# 1. Steps to Setup a Jenkins Server along with Docker Engine:
 
 1. Install Jenkins in a Linux Machine using the below Commands:
 
@@ -25,33 +30,92 @@ sudo apt-get install jenkins
 
 ```
 
+2. Install Docker in the Same Jenkins Machine:
+
+```
+apt update
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings docker-archive-keyring.gpg
+
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+
+sudo apt install docker-ce docker-ce-cli containerd.io
+
+usermod -aG docker jenkins
+
+usermod -aG docker ubuntu
+
+systemctl restart docker
+
+systemctl status docker
+
+Optional : To check the docker status: docker run hello-world
+
+```
+
 2. Create The Pipeline project in Jenkins and Choose the Github as a SCM.
 
-Maven Plugin needed for this, After install the Maven just Set it in the Global Configuration tools and call it in our groovy Script.
+Maven & Docker Pipeline Plugins are needed for this, After install the Maven just Set it in the Global Configuration tools and call it in our groovy Script. 
 
-My pipeline Groovy Script Placed in the following Path: 3.CICDPROJECT_USING_MAVEN/spring-boot-app/JenkinsFile (Should be placed in the pox.xml folder)
+Note: Name Should be same in the Groovy script environment same as in the Global configuration tools page.
 
-3. Start the BUild. Once Build completed JAR File would be located in the Jenkins WorkSpace Folder and Path would be /var/lib/jenkins/workspace/<buildname>/spring-boot-app/target/
+Add the Docker Hub Credentials in the credentials manager page global Option. (ID name should be same in both credentials page and groovy script. In my case it is "docker-hub-credentials")
+
+My pipeline Groovy Script Placed in the following Path: 5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/spring-boot-app/JenkinsFile (Should be placed in the pox.xml folder)
+
+My Docker build file also in the same path to build the Docker Image: 5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/spring-boot-app/Dockerfile
+
+Note: Before Start build, Just restrt it because made many changes: http://<ec2-instance-public-ip>:8080/restart
+
+3. Start the BUild. Once Build completed Docker image will be Stored in my Docker hub repository.
 
 
-# Ansible Server Setup for Jar file Deployment
+# 2. Ansible Server Setup For Docker Image deployment:
 
 ```
 sudo apt update
 
 sudo apt upgrade
 
-sudo apt-get install ansible ansible-doc
+sudo apt update
+
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+sudo apt install -y software-properties-common
+
+sudo apt-get install ansible
+
+ansible-galaxy collection install community.docker
+
+ansible-galaxy collection list
 
 ansible --version (To check the ansible version)
 ```
 
-Enable the Password less authentication from ansible Server to Jenkins server as well as Production Server by using ssh-keygen command.
+Enable the Password less authentication from ansible Server to Production Docker Server by using ssh-keygen command.
 
-My ansible YAML Script in the Following Path, Please Copy and use it For Your project:  4.CICDPROJECT_USING_MAVEN_WITH_ANSIBLE/deploy_spring_app.yml
+My ansible YAML Script in the Following Path in server (/etc/ansible/playbooks/appdeploy.yml), Please Copy and use it For Your project from Github:  5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/deploy_spring_app.yml
 
-My hosts file sample Mentioned in the Following path: 4.CICDPROJECT_USING_MAVEN_WITH_ANSIBLE/inventoryfile
+My hosts file also Mentioned in the Following path: 5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/inventoryfile
+
+My ansible.cfg file mentioned in the following path: 5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/ansible.cfg
+
+We need to Store the Docker Hub credentials in the encrypted format in the same path where our playbook is present.In my case(/etc/ansible/playbook/docker_credentials.yml)
+
+```
+ansible-vault create docker_credentials.yml
+
+```
+
+Password file Format should like below:
+
+docker_user: "your_docker_username"
+docker_password: "your_docker_password"
 
 In this Project for testing I used the root user for enable the passwordless authentication, If you are working in production system use respective users.
 
-I created 3 VM's in AWS and profermed the activity, So i mentioned those IP addresses in inventory, Replace it with your IPs.
+I created 3 VM's in AWS and proformed the activity, So i mentioned those IP addresses in inventory, Replace it with your IPs.

@@ -1,0 +1,36 @@
+---
+- name: Deploy Docker image from Docker Hub
+  hosts: docker
+  become: true
+
+  vars_files:
+    - docker_credentials.yml  # Ensure this file contains your Docker Hub credentials
+
+  vars:
+    docker_image: "codekbganesh/springbootapp:1.0"
+    container_name: "springboot_container"
+    app_port: 8080  # Port your Spring Boot app listens on
+
+  tasks:
+    - name: Login to Docker Hub
+      docker_login:
+        username: "{{ docker_user }}"
+        password: "{{ docker_password }}"
+
+    - name: Pull Docker image from Docker Hub
+      docker_image:
+        name: "{{ docker_image }}"
+        source: pull
+
+    - name: Stop and remove existing container (if any)
+      docker_container:
+        name: "{{ container_name }}"
+        state: absent
+
+    - name: Run the Docker container
+      docker_container:
+        name: "{{ container_name }}"
+        image: "{{ docker_image }}"
+        state: started
+        ports:
+          - "8080:{{ app_port }}"

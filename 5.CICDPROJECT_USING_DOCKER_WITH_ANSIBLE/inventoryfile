@@ -1,0 +1,2 @@
+[docker]
+172.31.43.19 ansible_user=root
