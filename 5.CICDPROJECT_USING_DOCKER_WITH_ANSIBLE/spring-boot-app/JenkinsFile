@@ -1,8 +1,11 @@
-pipeline {
+pipeline { 
     agent any
 
     environment {
         MAVEN_HOME = tool name: 'Maven' // Ensure this matches your Maven configuration in Jenkins
+        DOCKER_HUB_USERNAME = 'codekbganesh'
+        DOCKER_HUB_REPO = 'springbootapp'
+        IMAGE_TAG = '1.0'
     }
 
     stages {
@@ -14,7 +17,7 @@ pipeline {
 
         stage('Compile Code') {
             steps {
-                dir('3.CICDPROJECT_USING_MAVEN/spring-boot-app') {
+                dir('5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/spring-boot-app') {
                     script {
                         sh "${MAVEN_HOME}/bin/mvn compile"
                     }
@@ -24,7 +27,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir('3.CICDPROJECT_USING_MAVEN/spring-boot-app') {
+                dir('5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/spring-boot-app') {
                     script {
                         sh "${MAVEN_HOME}/bin/mvn test"
                     }
@@ -34,7 +37,7 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                dir('3.CICDPROJECT_USING_MAVEN/spring-boot-app') {
+                dir('5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/spring-boot-app') {
                     script {
                         sh "${MAVEN_HOME}/bin/mvn clean install"
                     }
@@ -42,10 +45,29 @@ pipeline {
             }
         }
 
-        stage('Archive JAR') {
+        stage('Build Docker Image') {
             steps {
-                dir('3.CICDPROJECT_USING_MAVEN/spring-boot-app') {
-                    archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+                dir('5.CICDPROJECT_USING_DOCKER_WITH_ANSIBLE/spring-boot-app') {
+                    script {
+                        // Build the Docker image
+                        sh """
+                        docker build -t ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}:${IMAGE_TAG} .
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Login to Docker Hub
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                        echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin
+                        docker push ${DOCKER_HUB_USERNAME}/${DOCKER_HUB_REPO}:${IMAGE_TAG}
+                        """
+                    }
                 }
             }
         }
@@ -53,10 +75,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build, testing, and packaging succeeded!'
+            echo 'Build, testing, packaging, and Docker image push succeeded!'
         }
         failure {
-            echo 'Build, testing, or packaging failed.'
+            echo 'Build, testing, packaging, or Docker image push failed.'
         }
     }
 }
