@@ -1,0 +1,33 @@
+---
+- name: Deploy Spring Boot application
+  hosts: jenkins
+  tasks:
+    - name: Fetch the new JAR file from the Jenkins server
+      fetch:
+        src: /var/lib/jenkins/workspace/jenkintest/3.CICDPROJECT_USING_MAVEN/spring-boot-app/target/spring-boot-web.jar
+        dest: /tmp/spring-boot-web.jar
+        flat: yes
+
+- name: Deploy to production
+  hosts: prod
+  tasks:
+    - name: Stop the existing Spring Boot application
+      ansible.builtin.shell: |
+        ps aux | grep 'spring-boot-web.jar' | grep -v grep | awk '{print $2}' | xargs kill -9 || echo "No process running"
+      ignore_errors: yes
+
+    - name: Backup the old JAR file
+      ansible.builtin.shell: |
+        mv /home/ubuntu/Jenkins_Test_app/spring-boot-app/target/spring-boot-web.jar /home/ubuntu/Jenkins_Test_app/spring-boot-app/target/spring-boot-web.jar.bak-$(date +%F-%T)
+
+    - name: Copy the new JAR file to the production server
+      copy:
+        src: /tmp/spring-boot-web.jar
+        dest: /home/ubuntu/Jenkins_Test_app/spring-boot-app/target/spring-boot-web.jar
+        mode: '0755'
+
+    - name: Start the new Spring Boot application
+      ansible.builtin.shell: |
+        nohup java -jar /home/ubuntu/Jenkins_Test_app/spring-boot-app/target/spring-boot-web.jar &
+      async: 30
+      poll: 0
