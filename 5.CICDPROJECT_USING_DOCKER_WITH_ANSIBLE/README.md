@@ -127,7 +127,7 @@ I created 3 VM's in AWS and proformed the activity, So i mentioned those IP addr
 
 Already production server Running with Docker with Old version(Installation Steps are same like Jenkins Server)
 
-If we want to deploy docker image from ansible server to Production server remotely we much require the docker plugin in the production Docker Server.Steps mentioned below.
+If we want to deploy docker image from ansible server to Production server remotely we must require the docker plugin in the production Docker Server. Steps mentioned below.
 
 ```
 sudo ansible --version
