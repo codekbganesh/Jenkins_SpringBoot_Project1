@@ -130,7 +130,6 @@ Already production server Running with Docker with Old version(Installation Step
 If we want to deploy docker image from ansible server to Production server remotely we must require the docker plugin in the production Docker Server. Steps mentioned below.
 
 ```
-sudo ansible --version
 sudo apt install python3-pip
 sudo pip3 install docker
 ```
